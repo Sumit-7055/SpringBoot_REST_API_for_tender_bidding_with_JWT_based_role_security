@@ -16,31 +16,35 @@ import com.fresco.tenderManagement.model.BiddingModel;
 import com.fresco.tenderManagement.service.BiddingService;
 
 
+@RestController
 @RequestMapping("/bidding")
 public class BiddingController {
 
-    
+    @Autowired
     private BiddingService biddingService;
 
     @PostMapping("/add")
     public ResponseEntity<Object> postBidding(@RequestBody BiddingModel biddingModel) {
-
-        ResponseEntity<Object> postResult = biddingService.postBidding(biddingModel);
-        return null;
+        return biddingService.postBidding(biddingModel);
     }
 
+    //    Go to the "Headers" tab in Postman.
+//Add a new header:
+//Key: Authorization
+//Value: Bearer <your-jwt-token>
+//Example: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiaWRkZXJlbWFpbEBnbWFpbC5jb20iLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiQklEREVSIn1dLCJleHAiOjE3Nzg1NzA4MDUsImlhdCI6MTc3ODU1MjgwNX0.Tr3op2wIrZeIPntk2nGHTA2bU-6eCMC3BLn0MKASjNnmH84UX30s_VmROT2oauOEv1QBQPyv5p8Zjs773rDM8A
     @GetMapping("/list")
     public ResponseEntity<Object> getBidding(@RequestParam double bidAmount) {
-        return null;
+        return biddingService.getBidding(bidAmount);
     }
 
     @PatchMapping("/update/{id}")
     public ResponseEntity<Object> updateBidding(@PathVariable int id, @RequestBody BiddingModel biddingModel) {
-        return null;
+        return biddingService.updateBidding(id, biddingModel);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Object> deleteBidding(@PathVariable int id) {
-        return null;
+        return biddingService.deleteBidding(id);
     }
 }

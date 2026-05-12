@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,18 +19,31 @@ import java.util.Map;
 
 @RestController
 public class LoginController {
-
-    
+    @Autowired
     private AuthenticationManager authenticationManager;
 
-    
+    @Autowired
     private LoginService loginService;
 
-    
+    @Autowired
     private JWTUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> authenticateUser( LoginDTO loginDTO) throws Exception {
-        return null;
+    public ResponseEntity<Object> authenticateUser( @RequestBody LoginDTO loginDTO)  {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword())
+            );
+
+            UserDetails userDetails = loginService.loadUserByUsername(loginDTO.getEmail());
+            String jwt = jwtUtil.generateToken(userDetails);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("jwt", jwt);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e) {
+            return new ResponseEntity<>("Invalid credentials", HttpStatus.BAD_REQUEST);
+        }
     }
 }

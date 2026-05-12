@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
-public class JWTUtil implements Serializable {
+public class JWTUtil {
 
     private static final long serialVersionUID = 654352132132L;
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60; // 5 hours
@@ -24,6 +24,7 @@ public class JWTUtil implements Serializable {
 
     @Autowired
     private UserService userService;
+
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
@@ -34,28 +35,37 @@ public class JWTUtil implements Serializable {
     }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-    	return null;
-    } 
+        final Claims claims = getAllClaimsFromToken(token);
+        return claimsResolver.apply(claims);
+    }
 
     private Claims getAllClaimsFromToken(String token) {
-        return null;
+        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
-    	final Date date= getExpirationDateFromToken( token);
-        return date.before(new Date());
+        final Date expiration = getExpirationDateFromToken(token);
+        return expiration.before(new Date());
     }
 
     public String generateToken(UserDetails userDetails) {
-    	
-        return null;
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", userDetails.getAuthorities());
+        return doGenerateToken(claims, userDetails.getUsername());
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
-        return null;
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
+                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        return null;
+        final String username = getUsernameFromToken(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 }

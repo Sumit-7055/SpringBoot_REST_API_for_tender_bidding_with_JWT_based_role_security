@@ -4,11 +4,14 @@ import com.fresco.tenderManagement.service.UserService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,7 +23,7 @@ public class JWTUtil {
     private static final long serialVersionUID = 654352132132L;
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60; // 5 hours
 
-    private final String secretKey = "randomkey123";
+    private final String secretKey = "sumitkumarrandomkey1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN";
 
     @Autowired
     private UserService userService;
@@ -40,7 +43,12 @@ public class JWTUtil {
     }
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -59,13 +67,17 @@ public class JWTUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
-                .signWith(SignatureAlgorithm.HS512, secretKey)
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY ))
+                .signWith(SignatureAlgorithm.HS256, getSignKey())
                 .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+    private Key getSignKey() {
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }

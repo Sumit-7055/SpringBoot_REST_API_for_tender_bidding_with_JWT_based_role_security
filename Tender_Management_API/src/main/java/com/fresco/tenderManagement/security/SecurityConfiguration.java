@@ -46,7 +46,8 @@ public class SecurityConfiguration {
 
     @Bean
     WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers(new AntPathRequestMatcher("/h2-console/**"));
+        return (web) -> web.ignoring().requestMatchers(new AntPathRequestMatcher("/h2-console/**"))
+                .requestMatchers(new AntPathRequestMatcher("/login"));
     }
 
     @Bean

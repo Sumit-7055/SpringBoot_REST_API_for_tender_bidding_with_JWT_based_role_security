@@ -2,6 +2,8 @@ package com.fresco.tenderManagement.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,8 +26,8 @@ public class BiddingController {
     private BiddingService biddingService;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> postBidding(@RequestBody BiddingModel biddingModel) {
-        return biddingService.postBidding(biddingModel);
+    public ResponseEntity<Object> postBidding(@AuthenticationPrincipal UserDetails user, @RequestBody BiddingModel biddingModel) {
+        return biddingService.postBidding(user,biddingModel);
     }
 
     //    Go to the "Headers" tab in Postman.
@@ -39,8 +41,8 @@ public class BiddingController {
     }
 
     @PatchMapping("/update/{id}")
-    public ResponseEntity<Object> updateBidding(@PathVariable int id, @RequestBody BiddingModel biddingModel) {
-        return biddingService.updateBidding(id, biddingModel);
+    public ResponseEntity<Object> updateBidding(@AuthenticationPrincipal UserDetails details,@PathVariable int id, @RequestBody BiddingModel biddingModel) {
+        return biddingService.updateBidding(details,id, biddingModel);
     }
 
     @DeleteMapping("/delete/{id}")

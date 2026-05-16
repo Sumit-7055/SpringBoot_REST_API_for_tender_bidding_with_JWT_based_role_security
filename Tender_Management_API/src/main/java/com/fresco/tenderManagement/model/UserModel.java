@@ -1,7 +1,7 @@
 package com.fresco.tenderManagement.model;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "Users")
@@ -19,7 +19,7 @@ public class UserModel {
     private String password;
     @Column(name = "email", unique = true)
     private String email;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "role", referencedColumnName = "id")
     private RoleModel role;
 
